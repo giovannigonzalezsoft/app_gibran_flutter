@@ -6,6 +6,7 @@ import 'package:flutter_experiment/src/pages/nip.dart';
 import 'package:flutter_experiment/src/widgets/appbar.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
 // ignore: use_key_in_widget_constructors
 class HomePage extends StatefulWidget {
@@ -15,20 +16,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  File? _image;
-  final imagePicker = ImagePicker();
-
-  Future getImage() async {
-    final image = await imagePicker.pickImage(source: ImageSource.camera);
-    setState(() {
-      _image = File(image!.path);
-    });
-  }
-
-  void sendImage() {
-    const Text("Se envio la imagen...");
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,11 +89,12 @@ class _HomePageState extends State<HomePage> {
                   //BTN HUELLA
                   ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Huella()), //IR A CLAVE PAGE
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //       builder: (context) => Huella()), //IR A CLAVE PAGE
+                      // );
+                      pruebaGet();
                     },
                     //ESTILOS BTN CLAVE
                     icon: Icon(Icons.fingerprint),
@@ -127,5 +115,25 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ));
+  }
+}
+
+Future pruebaGet() async {
+  Uri apiUrl = Uri.parse('http://192.168.100.46:3000/api/user/all');
+
+  var headers = {
+    'Authorization':
+        'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWRfYWRtaW4iOiIwIiwiX2lkIjoiNjFjZTRiYTVkMDg1NWU0ODA0ODZjODljIiwibmFtZSI6ImFkbWluIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNjQwOTA5NzM2LCJleHAiOjE2NDQwNjMzMzZ9.w6jh_6nnoNq0qweE-sdkYKUPLcHT8yfjgJJeHXukTXw'
+  };
+  var request = http.Request('GET', apiUrl);
+
+  request.headers.addAll(headers);
+
+  http.StreamedResponse response = await request.send();
+
+  if (response.statusCode == 200) {
+    print(await response.stream.bytesToString());
+  } else {
+    print(response.reasonPhrase);
   }
 }

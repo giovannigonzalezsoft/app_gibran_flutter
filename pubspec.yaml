@@ -39,6 +39,7 @@ dependencies:
   image_picker: ^0.8.4+4
   http: ^0.13.4
   video_player: ^2.2.7
+  mime: ^1.0.1
 
 dev_dependencies:
   flutter_test:
