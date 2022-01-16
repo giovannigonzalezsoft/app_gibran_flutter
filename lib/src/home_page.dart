@@ -1,11 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 import 'package:flutter_experiment/src/pages/camera.dart';
+import 'package:flutter_experiment/src/pages/credenciales.dart';
 import 'package:flutter_experiment/src/pages/huella.dart';
 import 'package:flutter_experiment/src/pages/nip.dart';
 import 'package:flutter_experiment/src/widgets/appbar.dart';
 import 'dart:io';
-import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
 // ignore: use_key_in_widget_constructors
@@ -60,20 +60,21 @@ class _HomePageState extends State<HomePage> {
                   Padding(
                     padding: EdgeInsets.all(10.0),
                   ),
-                  //BTN_CLAVE
+                  //BTN_CREDENCIALES
                   ElevatedButton.icon(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => Clave()), //IR A CLAVE PAGE
+                            builder: (context) =>
+                                Credenciales()), //IR A CLAVE PAGE
                       );
                     },
                     //ESTILOS BTN CLAVE
                     icon: Icon(Icons.password),
                     label: Padding(
-                      padding: const EdgeInsets.all(14.0),
-                      child: Text('2. Nip'),
+                      padding: const EdgeInsets.all(5.0),
+                      child: Text('2. byUser'),
                     ),
                     style: ElevatedButton.styleFrom(
                         fixedSize: const Size(160, 58),
@@ -89,12 +90,12 @@ class _HomePageState extends State<HomePage> {
                   //BTN HUELLA
                   ElevatedButton.icon(
                     onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //       builder: (context) => Huella()), //IR A CLAVE PAGE
-                      // );
-                      pruebaGet();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Huella()), //IR A CLAVE PAGE
+                      );
+                      // pruebaGet();
                     },
                     //ESTILOS BTN CLAVE
                     icon: Icon(Icons.fingerprint),

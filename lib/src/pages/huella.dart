@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_experiment/src/controllers/todo_controller.dart';
-import 'package:flutter_experiment/src/models/todo.dart';
-import 'package:flutter_experiment/src/services/todo_service.dart';
+//import 'package:flutter_experiment/src/controllers/todo_controller.dart';
+//import 'package:flutter_experiment/src/models/todo.dart';
+import 'package:http/http.dart' as http;
+//import 'package:flutter_experiment/src/services/todo_service.dart';
 import 'package:flutter_experiment/src/widgets/appbar.dart';
 
 class Huella extends StatefulWidget {
@@ -13,34 +14,31 @@ class Huella extends StatefulWidget {
 }
 
 class _HuellaState extends State<Huella> {
-  var todoController = TodoController(TodoService());
+  //var todoController = TodoController(TodoService());
+  Uri apiUrlArd = Uri.parse('http://198.162.0.17:3000/api/arduino/huella');
+
+  Future getHuella() async {
+    var request = http.Request('GET', apiUrlArd);
+
+    http.StreamedResponse response = await request.send();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: CustomBar(
-          title: 'Prueba',
+          title: 'Huella',
         ),
-        body: FutureBuilder(
-          future: todoController.fetchTodoList(),
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return const Center(child: Text('Error :('));
-            }
-            return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  var todolist = snapshot.data?[index];
-                  return ListTile(
-                    title: Text('${todolist?.title}'),
-                    leading: Text('${todolist?.id}'),
-                    subtitle: Text('${todolist?.completed}'),
-                  );
-                });
-          },
-        ));
+        body: const Center(
+            child: Text(
+          'Capture su huella',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+        )),
+        floatingActionButton: FloatingActionButton.extended(
+            heroTag: null,
+            onPressed: getHuella,
+            backgroundColor: Colors.deepPurple,
+            label: Text('Capturar'),
+            icon: Icon(Icons.fingerprint)));
   }
 }

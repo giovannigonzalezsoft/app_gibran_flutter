@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_experiment/src/controllers/bio_controller.dart';
-import 'package:flutter_experiment/src/models/bio_recognition.dart';
+//import 'package:flutter_experiment/src/models/bio_recognition.dart';
 import 'package:flutter_experiment/src/services/bio.service.dart';
 import 'package:flutter_experiment/src/widgets/appbar.dart';
 import 'dart:io';
@@ -17,18 +17,16 @@ class Camera extends StatefulWidget {
 
 class _Camera extends State<Camera> {
   VideoPlayerController? _filevid;
-  final _bioController = BioController(BioService());
+  //final _bioController = BioController(BioService());
   File? _fileimg;
   List<File> files = [];
   final imagePicker = ImagePicker();
+  String resp = '';
 
   Future getImage() async {
     //obtener img
     final img = await imagePicker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 50,
-        maxHeight: 500.0,
-        maxWidth: 500);
+        source: ImageSource.camera, maxHeight: 500.0, maxWidth: 500);
     setState(() {
       _filevid = null; //Clean video
       _fileimg = File(img!.path);
@@ -50,9 +48,10 @@ class _Camera extends State<Camera> {
   }
 
   Uri apiUrl = Uri.parse('http://192.168.100.46:3000/api/sign-in/face-id');
+  Uri apiUrlArd = Uri.parse('http://198.162.0.17:3000/api/arduino/face-id');
 
   Future upload() async {
-    var request = http.MultipartRequest("POST", apiUrl);
+    var request = http.MultipartRequest("POST", apiUrlArd);
     // multipart that takes file
     // request.files.add(http.MultipartFile(
     //     'files', _fileimg!.readAsBytes().asStream(), _fileimg!.lengthSync(),
@@ -70,12 +69,85 @@ class _Camera extends State<Camera> {
 
     // send
     var response = await request.send();
-    print(response.statusCode);
 
-    // listen for response
-    response.stream.transform(utf8.decoder).listen((value) {
-      print(value);
-    });
+    resp = await response.stream.bytesToString();
+    final body = json.decode(resp);
+
+    //CONDICION PARA ******APP ARDUINO********
+    if (body['valor'] == 'true') {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Bienvenido'),
+            actions: [
+              ElevatedButton(
+                child: Text('Ok'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Credenciales Incorrectas'),
+            actions: [
+              ElevatedButton(
+                child: Text(':('),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    // CONDICION PARA ******APP GIBRAN/MIRSA********
+    // if (response.statusCode == 201) {
+    //   print(await response.stream.bytesToString());
+    //   showDialog(
+    //     context: context,
+    //     builder: (BuildContext context) {
+    //       return AlertDialog(
+    //         title: Text('Bienvenido'),
+    //         actions: [
+    //           ElevatedButton(
+    //             child: Text('Ok'),
+    //             onPressed: () {
+    //               Navigator.pop(context);
+    //             },
+    //           ),
+    //         ],
+    //       );
+    //     },
+    //   );
+    // } else {
+    //   print(response.reasonPhrase);
+    //   showDialog(
+    //     context: context,
+    //     builder: (BuildContext context) {
+    //       return AlertDialog(
+    //         title: Text('No se reconocio FaceID'),
+    //         actions: [
+    //           ElevatedButton(
+    //             child: Text(':('),
+    //             onPressed: () {
+    //               Navigator.pop(context);
+    //             },
+    //           ),
+    //         ],
+    //       );
+    //     },
+    //   );
+    // }
     files = []; //limpiar lista
   }
 
